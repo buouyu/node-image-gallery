@@ -1,0 +1,63 @@
+.shadow-card {
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.05);
+  /* text-align: center; */
+  /* margin-bottom: 30rpx; */
+}
+
+.two-line-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 限制显示2行 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.one-line-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* 限制显示2行 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.add-point-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  text-align: center;
+  display: f;
+  background: rgba(0, 255, 0, 0.4);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(0, 255, 0, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 255, 0, 0.25);
+  font-weight: 500;
+}
+
+.btn-distance-bottom {
+  bottom: 1rem;
+}
+
+.custom-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  color: inherit;
+  box-shadow: none;
+  border-radius: 0;
+  line-height: normal;
+  text-align: left;
+  outline: none;
+}
+.custom-button::after {
+  border: none;
+  /* 尝试覆盖边框 */
+}
+
+.inline-block {
+  display: inline-block;
+}
