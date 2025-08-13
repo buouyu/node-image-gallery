@@ -2,10 +2,10 @@
 async function wxUpdataVersion() {
   // #ifdef MP-WEIXIN
   const updateManager = wx.getUpdateManager();
-  console.log('updateManager-----5', updateManager)
+  console.log("updateManager-----5", updateManager);
   // 检查新版本
   updateManager.onCheckForUpdate((res) => {
-    console.log('res.hasUpdate-----8', res.hasUpdate)
+    console.log("res.hasUpdate-----8", res.hasUpdate);
     console.log("是否有新版本：", res.hasUpdate);
   });
 
@@ -37,7 +37,7 @@ export default {
   },
   onShow: function () {
     // console.log('App Show')
-    wxUpdataVersion()
+    wxUpdataVersion();
   },
   onHide: function () {
     // console.log('App Hide')
@@ -50,7 +50,7 @@ export default {
 uni-page-body {
   height: 100%;
 
-  &>.container {
+  & > .container {
     height: 100%;
     width: 100%;
   }
@@ -75,6 +75,9 @@ uni-page-body {
   box-sizing: border-box;
 }
 // #endif
+#u-a-p > div {
+  z-index: 999999;
+}
 @import "./utils/common.css";
 @import "lby-common/style/index.css";
 /* 注意要写在第一行，同时给style标签加入lang="scss"属性 */

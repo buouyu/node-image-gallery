@@ -1,159 +1,132 @@
 <template>
-  <view class="file-list-page">
-    <!-- 页头 -->
-    <view class="header">
-      <text class="title">文件管理</text>
-
-      <!-- 面包屑导航 -->
-      <view class="breadcrumb">
-        <view 
-          class="crumb" 
-          v-for="(crumb, index) in breadcrumbs" 
-          :key="index"
-        >
-          <text class="crumb-text">{{ crumb }}</text>
-          <text v-if="index < breadcrumbs.length - 1" class="separator">›</text>
-        </view>
+  <view class="file-detail-card">
+    <view class="detail-header">
+      <image class="file-icon" src="/static/icons/file.png" mode="aspectFit" />
+      <view class="file-info">
+        <text class="file-name">example.png</text>
+        <text class="file-type">图片文件</text>
       </view>
     </view>
 
-    <!-- 文件列表 -->
-    <scroll-view scroll-y class="file-list">
-      <view class="file-item" v-for="(item, index) in mockFiles" :key="index">
-        <!-- 文件/文件夹图标 -->
-        <view class="icon" :class="item.type"></view>
-
-        <!-- 文件信息 -->
-        <view class="info">
-          <text class="name">{{ item.name }}</text>
-          <text class="meta">
-            {{ item.type === 'directory' ? '文件夹' : formatSize(item.size) }} · {{ item.modifiedTime }}
-          </text>
-        </view>
+    <view class="detail-body">
+      <view class="detail-row">
+        <text class="label">大小：</text>
+        <text class="value">2.34 MB</text>
       </view>
-    </scroll-view>
+      <view class="detail-row">
+        <text class="label">类型：</text>
+        <text class="value">PNG 图片</text>
+      </view>
+      <view class="detail-row">
+        <text class="label">创建时间：</text>
+        <text class="value">2025-08-10 14:32</text>
+      </view>
+      <view class="detail-row">
+        <text class="label">最后修改：</text>
+        <text class="value">2025-08-12 19:20</text>
+      </view>
+      <view class="detail-row">
+        <text class="label">路径：</text>
+        <text class="value">/root/aaaa/example.png</text>
+      </view>
+    </view>
+
+    <view class="detail-actions">
+      <button class="btn open-btn">打开文件</button>
+      <button class="btn download-btn">下载</button>
+      <button class="btn delete-btn">删除</button>
+    </view>
   </view>
 </template>
 
-<script setup>
-// 面包屑静态数据
-const breadcrumbs = ["根目录", "文档", "工作", "设计图"];
-
-// 静态文件数据
-const mockFiles = [
-  { name: "资料", type: "directory", size: null, modifiedTime: "2025-08-13 10:20" },
-  { name: "photo.jpg", type: "file", size: 2456789, modifiedTime: "2025-08-11 14:30" },
-  { name: "music.mp3", type: "file", size: 5890234, modifiedTime: "2025-08-10 09:15" },
-  { name: "项目文件", type: "directory", size: null, modifiedTime: "2025-08-09 20:05" }
-];
-
-// 文件大小格式化
-const formatSize = (bytes) => {
-  if (bytes == null) return "";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-  return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
-};
-</script>
-
 <style lang="scss" scoped>
-.file-list-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: #f8f9fb;
+.file-detail-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 16px;
+  margin: 16px;
+  font-size: 14px;
+  color: #333;
 
-  .header {
-    background: #4a90e2;
-    padding: 20rpx 30rpx 30rpx;
-    color: #fff;
-    font-size: 36rpx;
-    font-weight: bold;
-    box-shadow: 0 4rpx 8rpx rgba(0,0,0,0.1);
+  .detail-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
 
-    .title {
-      display: block;
-      margin-bottom: 12rpx;
+    .file-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: #f0f0f0;
+      margin-right: 12px;
     }
 
-    .breadcrumb {
+    .file-info {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      font-size: 26rpx;
+      flex-direction: column;
 
-      .crumb {
-        display: flex;
-        align-items: center;
-
-        .crumb-text {
-          background: rgba(255, 255, 255, 0.2);
-          padding: 6rpx 14rpx;
-          border-radius: 8rpx;
-          transition: background 0.2s;
-        }
-
-        &:hover .crumb-text {
-          background: rgba(255, 255, 255, 0.35);
-        }
-
-        .separator {
-          margin: 0 10rpx;
-          color: rgba(255, 255, 255, 0.7);
-        }
+      .file-name {
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .file-type {
+        font-size: 12px;
+        color: #888;
       }
     }
   }
 
-  .file-list {
-    flex: 1;
-    padding: 20rpx;
+  .detail-body {
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+    margin-top: 8px;
 
-    .file-item {
+    .detail-row {
       display: flex;
-      align-items: center;
-      background: #fff;
-      border-radius: 12rpx;
-      padding: 20rpx;
-      margin-bottom: 20rpx;
-      box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
-      transition: transform 0.2s ease;
+      margin-bottom: 6px;
 
-      &:active {
-        transform: scale(0.98);
+      .label {
+        width: 90px;
+        color: #666;
       }
-
-      .icon {
-        width: 60rpx;
-        height: 60rpx;
-        margin-right: 20rpx;
-        background-size: cover;
-        &.directory {
-          background-image: url('https://img.icons8.com/fluency/96/folder-invoices.png');
-        }
-        &.file {
-          background-image: url('https://img.icons8.com/fluency/96/document.png');
-        }
-      }
-
-      .info {
-        display: flex;
-        flex-direction: column;
+      .value {
         flex: 1;
-
-        .name {
-          font-size: 30rpx;
-          font-weight: 500;
-          color: #333;
-          margin-bottom: 6rpx;
-        }
-
-        .meta {
-          font-size: 24rpx;
-          color: #999;
-        }
+        color: #333;
+        word-break: break-all;
       }
+    }
+  }
+
+  .detail-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+
+    .btn {
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 6px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .open-btn {
+      background-color: #4cafef;
+      color: white;
+      &:hover { background-color: #339be0; }
+    }
+    .download-btn {
+      background-color: #ffd966;
+      color: #664d00;
+      &:hover { background-color: #ffcc33; }
+    }
+    .delete-btn {
+      background-color: #f87171;
+      color: white;
+      &:hover { background-color: #ef4444; }
     }
   }
 }

@@ -20,3 +20,6 @@ app.post(`${prefix}/upload`, verifyToken, upload.single('file'), asyncHandler(as
     const suffix = originalnamearr[originalnamearr.length - 1]
 
 }))
+
+
+http://localhost:3000/files/公众号：非哥黑科技1528.jpg
