@@ -6,14 +6,17 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-node-image-hosting-server
-node-image-hosting-server.zip
 files
 node_modules
 public
 .DS_Store
 dist
 *.local
+
+node-image-hosting-server/files
+node-image-hosting-server/public
+node-image-hosting-server/node-image-hosting-server
+node-image-hosting-server/node-image-hosting-server.zip
 
 # Editor directories and files
 .idea

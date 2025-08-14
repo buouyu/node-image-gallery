@@ -11,7 +11,11 @@ case $1 in
         
     ;;
     up)
-       
+        echo "更新"
+        rm -rf dist
+        npm run build
+        rm -rf ../node-image-hosting-server/public/*
+        cp -r dist/build/h5/* ../node-image-hosting-server/public
     ;;
     
     status)

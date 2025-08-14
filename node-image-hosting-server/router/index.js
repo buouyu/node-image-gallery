@@ -77,7 +77,7 @@ exports.SECRET_KEY = SECRET_KEY
 exports.initRouter = async (routes) => {
     initExtraRouters(routes)
     loginApis()
-    const port = 3000;
+    const port = 8989;
     const url = `http://localhost:${port}`
     app.listen(port, () => {
         console.log(url)

@@ -116,7 +116,6 @@ import { useList, rqs, formatTime } from "lby-common";
 //     { name: "项目文件", type: "directory", size: null, modifiedTime: "2025-08-09 20:05" }
 // ];
 const defaultFileUrl = "https://img.icons8.com/fluency/96/document.png";
-const baseUrl = "http://localhost:3000/files";
 const currentDirectorys = ref([]);
 const isShowUplaodPopup = ref(false);
 const uplaodRef = ref(null);
@@ -139,7 +138,7 @@ const { getList, total, current, list, isLoading, saveItem } = useList(
     console.log("res-----14", res);
     res.map((it) => {
       if (it.type == "file") {
-        it.fullPath = baseUrl + currentPath.value + "/" + it.name;
+        // it.fullPath = baseUrl + currentPath.value + "/" + it.name;
         if (isImageFile(it.name)) {
           it.url = it.fullPath;
         }
@@ -155,7 +154,7 @@ const { getList, total, current, list, isLoading, saveItem } = useList(
       if (a.type === 'directory') {
         return a.name.localeCompare(b.name);
       }
-      return a.ext.localeCompare(b.ext);
+      // return a.ext.localeCompare(b.ext);
     })
   }
 );

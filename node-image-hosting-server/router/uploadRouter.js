@@ -1,12 +1,12 @@
 const { app, baseDir, verifyToken } = require('./index.js')
 const { asyncHandler, md5, formatTime } = require('./utils.js')
+const { fileBaseUrl } = require('../config.js')
 const fs = require("fs");
 const multer = require('multer');
 const path = require("path");
 const prefix = '/api'
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
 const routers = [
     {
         url: '/file_list',
@@ -22,7 +22,8 @@ const routers = [
                 return {
                     name,
                     type: isdirectory ? "directory" : "file",
-                    ext: isdirectory ? null : path.extname(name).toLowerCase(), // 文件扩展名
+                    fullPath: `${fileBaseUrl}${query.path}/${name}`,
+                    // ext: isdirectory ? null : path.extname(name).toLowerCase(), // 文件扩展名
                     size: isdirectory ? null : stat.size,       // 文件大小（字节），文件夹为 null
                     modifiedTime: stat.mtime
                 };
@@ -74,17 +75,8 @@ app.post(`${prefix}/upload`, verifyToken, upload.single('file'), asyncHandler(as
     const mypath = req.body.path
     const targetPath = path.join(baseDir, mypath);
     fs.writeFileSync(targetPath, req.file.buffer);
-    // const path = `mark_yu/images/${date[0]}/${date[1]}/${name}.${suffix}`
-    // let result = await client.put(path, req.file.buffer);
-    // const url = result.url.replace(/^http:/, 'https:')
-    // const res = await imagesService.save({
-    //     ...req.body,
-    //     url: url,
-    //     // other_data: {
-    //     //     path: path
-    //     // }
-    // })
-    // return res
+    console.log('mypath-----77', mypath)
+    return `${fileBaseUrl}${mypath}`
 }))
 
 module.exports = routers

@@ -6,7 +6,7 @@ import global from "lby-common/utils/global";
 import {
 	setEnv
 } from 'lby-common/config'
-import env from "../env";
+import env from '@/env.js'
 import App from "./App.vue";
 import db from './db'
 uni.gb = global
