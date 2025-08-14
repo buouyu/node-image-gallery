@@ -22,6 +22,7 @@ const routers = [
                 return {
                     name,
                     type: isdirectory ? "directory" : "file",
+                    ext: isdirectory ? null : path.extname(name).toLowerCase(), // 文件扩展名
                     size: isdirectory ? null : stat.size,       // 文件大小（字节），文件夹为 null
                     modifiedTime: stat.mtime
                 };

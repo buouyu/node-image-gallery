@@ -21,5 +21,15 @@ app.post(`${prefix}/upload`, verifyToken, upload.single('file'), asyncHandler(as
 
 }))
 
-
-http://localhost:3000/files/公众号：非哥黑科技1528.jpg
+在node中，通过以下方式获取的文件列表如何按照文件类型进行排序
+ const files = fs.readdirSync(targetPath).map(name => {
+                const fullPath = path.join(targetPath, name);
+                const stat = fs.statSync(fullPath);
+                const isdirectory = stat.isDirectory()
+                return {
+                    name,
+                    type: isdirectory ? "directory" : "file",
+                    size: isdirectory ? null : stat.size,       // 文件大小（字节），文件夹为 null
+                    modifiedTime: stat.mtime
+                };
+            });

@@ -10,11 +10,23 @@ const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'zheshiyigehenchangdezifuchuanaaaa'; // 生产中请放入环境变量
 const baseDir = path.resolve(process.cwd(), 'files');
 if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
-app.use("/files", express.static(baseDir));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ limit: "50mb" }))
 app.use(express.static(rootPath))
 
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://sub.example.com'
+];
+app.use("/files", (req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type');
+    }
+    next();
+}, express.static(baseDir));
 
 function verifyToken(req, res, next) {
     const authHeader = req.headers['authorization'];
