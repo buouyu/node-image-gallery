@@ -1,12 +1,6 @@
 <template>
   <view class="page">
-    <ListPage
-      :getList="getList"
-      :total="total"
-      :current="current"
-      :list="list"
-      :isLoading="isLoading"
-    >
+    <ListPage :getList="getList" :total="total" :current="current" :list="list" :isLoading="isLoading">
       <template #header>
         <!-- <view>
                     文件管理
@@ -27,25 +21,16 @@
           <view @click="handleNewDirectory">+新建文件夹</view>
           <view @click="handleClickUpload">上传文件</view>
         </view> -->
-        <Popup
-          @confirm="handleUplaodConfirm"
-          v-model="isShowUplaodPopup"
-          okText="确认"
-          cancelText="取消"
-          title="上传文件"
-        >
+        <Popup @confirm="handleUplaodConfirm" v-model="isShowUplaodPopup" okText="确认" cancelText="取消" title="上传文件">
           <view class="p-2">
             <UploadFile ref="uplaodRef" />
           </view>
         </Popup>
-        <Popup v-model="isShowFileDetail" cancelText="关闭" title="文件详情">
+        <Popup zIndex="99" v-model="isShowFileDetail" okText="下载" @confirm="downloadFile(activeItem)" cancelText="关闭"
+          title="文件详情">
           <view class="file-detail-card">
             <view @click="handleViewImage(activeItem.fullPath)" class="detail-header">
-              <image
-                class="file-icon"
-                :src="activeItem.url || defaultFileUrl"
-                mode="aspectFit"
-              />
+              <image class="file-icon" :src="activeItem.url || defaultFileUrl" mode="aspectFit" />
             </view>
 
             <view class="detail-body">
@@ -73,26 +58,16 @@
               </view>
             </view>
 
-            <!-- <view class="detail-actions">
-              <button class="btn open-btn">打开文件</button>
-              <button class="btn download-btn">下载</button>
-              <button class="btn delete-btn">删除</button>
-            </view> -->
           </view>
         </Popup>
         <view class="file-manager-header">
           <!-- 路径导航 -->
           <view class="path-bar">
-            <text
-              @click="handleClickDirector(index, segment)"
-              v-for="(segment, index) in renderDirectorys"
-              :key="index"
-              class="path-segment"
-            >
+            <text @click="handleClickDirector(index, segment)" v-for="(segment, index) in renderDirectorys" :key="index"
+              class="path-segment">
               {{ segment }}
               <text v-if="index < renderDirectorys.length - 1" class="path-separator">
-                /</text
-              >
+                /</text>
             </text>
           </view>
 
@@ -171,9 +146,17 @@ const { getList, total, current, list, isLoading, saveItem } = useList(
         it.path = currentPath.value + "/" + it.name;
       }
       return it;
-    });
+    })
     // return mockFiles
-    return res;
+    return res.sort((a, b) => {
+      if (a.type !== b.type) {
+        return a.type === 'directory' ? -1 : 1;
+      }
+      if (a.type === 'directory') {
+        return a.name.localeCompare(b.name);
+      }
+      return a.ext.localeCompare(b.ext);
+    })
   }
 );
 const handleUplaodConfirm = async () => {
@@ -269,6 +252,56 @@ const handleViewImage = async (url) => {
   });
 };
 
+const downloadFile = async (item) => {
+  if (process.env.UNI_PLATFORM === 'h5') {
+    // const a = document.createElement('a');
+    // a.href = item.fullPath
+    // a.download = item.name
+    // document.body.appendChild(a);
+    // a.click();
+    // document.body.removeChild(a);
+    downloadImageH5(item.fullPath, item.name)
+  } else {
+    uni.downloadFile({
+      url: item.fullPath,
+      success: (res) => {
+        if (res.statusCode === 200) {
+          // 保存到本地
+          uni.saveFile({
+            tempFilePath: res.tempFilePath,
+            success: (saveRes) => {
+              uni.gb.showToast('下载成功')
+              console.log('文件已保存到：', saveRes.savedFilePath);
+            },
+            fail: (err) => {
+              uni.gb.showToast(err.message)
+              console.error('保存失败', err);
+            }
+          });
+        }
+      }
+    });
+  }
+}
+function downloadImageH5(url, filename) {
+  fetch(url, { mode: 'cors' }) // 必须支持 CORS
+    .then(res => res.blob())
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename || 'image.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+      uni.gb.showToast('下载成功')
+    })
+    .catch(err => {
+      uni.gb.showToast(err.message)
+    });
+}
+
 // 文件大小格式化
 const formatSize = (bytes) => {
   if (bytes == null) return "";
@@ -293,6 +326,7 @@ const formatSize = (bytes) => {
     align-items: center;
     justify-content: center;
     margin-bottom: 12px;
+
     .file-icon {
       width: 80%;
       //   height: 48px;
@@ -314,6 +348,7 @@ const formatSize = (bytes) => {
         width: 90px;
         color: #666;
       }
+
       .value {
         flex: 1;
         color: #333;
@@ -340,26 +375,32 @@ const formatSize = (bytes) => {
     .open-btn {
       background-color: #4cafef;
       color: white;
+
       &:hover {
         background-color: #339be0;
       }
     }
+
     .download-btn {
       background-color: #ffd966;
       color: #664d00;
+
       &:hover {
         background-color: #ffcc33;
       }
     }
+
     .delete-btn {
       background-color: #f87171;
       color: white;
+
       &:hover {
         background-color: #ef4444;
       }
     }
   }
 }
+
 .file-manager-header {
   background: #f8f9fb;
   padding: 12px 16px;
@@ -394,10 +435,10 @@ const formatSize = (bytes) => {
 
     .btn {
       flex: 1;
-      padding: 8px 12px;
+      padding: 0.1rem 0.2rem;
       border-radius: 6px;
       border: none;
-      font-size: 14px;
+      font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -431,6 +472,7 @@ const formatSize = (bytes) => {
     }
   }
 }
+
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
@@ -476,10 +518,12 @@ const formatSize = (bytes) => {
     height: 60rpx;
     margin-right: 20rpx;
     background-size: cover;
+
     .image {
       height: 100%;
       width: 100%;
     }
+
     &.directory {
       background-image: url("https://img.icons8.com/fluency/96/folder-invoices.png");
     }
@@ -508,8 +552,5 @@ const formatSize = (bytes) => {
       color: #999;
     }
   }
-}
-::v-deep #u-a-p > div {
-  z-index: 999999;
 }
 </style>
