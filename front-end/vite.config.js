@@ -32,7 +32,7 @@ export default defineConfig({
     open: false, // vite项目启动时自动打开浏览器
     host: '0.0.0.0', //设置为0.0.0.0则所有的地址均能访问
     // http://localhost:9191
-    // port: env.isDev ? 5555 : 5371,
+    port: 5377,
     proxy: {
       '/api': {
         target: env.url, // 目标服务  

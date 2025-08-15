@@ -2,28 +2,14 @@
   <view class="page">
     <ListPage :getList="getList" :total="total" :current="current" :list="list" :isLoading="isLoading">
       <template #header>
-        <!-- <view>
-                    文件管理
-                </view> -->
-        <!-- <view class="breadcrumb">
-          <view
-            @click="handleClickDirector(index, crumb)"
-            class="crumb"
-            v-for="(crumb, index) in renderDirectorys"
-            :key="index"
-          >
-            <text class="crumb-text">{{ crumb }}</text>
-            <text v-if="index < renderDirectorys.length - 1" class="separator">/</text>
-          </view>
-        </view>
-        <view>
-          <view @click="handleBack">返回上一级</view>
-          <view @click="handleNewDirectory">+新建文件夹</view>
-          <view @click="handleClickUpload">上传文件</view>
-        </view> -->
         <Popup @confirm="handleUplaodConfirm" v-model="isShowUplaodPopup" okText="确认" cancelText="取消" title="上传文件">
           <view class="p-2">
             <UploadFile ref="uplaodRef" />
+          </view>
+        </Popup>
+        <Popup @confirm="handleAddDirectory" v-model="isShowDireactor" okText="确认" cancelText="取消" title="新建文件夹">
+          <view class="p-2">
+            <up-input placeholder="请输入文件夹名称" border="bottom" v-model="directoryNmae"></up-input>
           </view>
         </Popup>
         <Popup zIndex="99" v-model="isShowFileDetail" okText="下载" @confirm="downloadFile(activeItem)" cancelText="关闭"
@@ -117,12 +103,14 @@ import ProgressLoading from '@/components/ProgressLoading.vue'
 //     { name: "music.mp3", type: "file", size: 5890234, modifiedTime: "2025-08-10 09:15" },
 //     { name: "项目文件", type: "directory", size: null, modifiedTime: "2025-08-09 20:05" }
 // ];
-const defaultFileUrl = "https://img.icons8.com/fluency/96/document.png";
+const defaultFileUrl = "https://buouyu.cn:8888/files/node-image-gallery/icon/document.png";
 const currentDirectorys = ref([]);
 const isShowUplaodPopup = ref(false);
 const uplaodRef = ref(null);
 const isUploadLoading = ref(false)
 const progress = ref(0)
+const isShowDireactor = ref(false)
+const directoryNmae = ref('')
 const renderDirectorys = computed(() => {
   return ["root", ...currentDirectorys.value];
 });
@@ -133,7 +121,7 @@ const currentPath = computed(() => {
   return "/" + currentDirectorys.value.join("/");
 });
 function isImageFile(fileName) {
-  return /\.(jpg|png|gif)$/i.test(fileName);
+  return /\.(jpg|png|gif|jpeg)$/i.test(fileName);
 }
 const { getList, total, current, list, isLoading, saveItem } = useList(
   [currentPath],
@@ -151,7 +139,15 @@ const { getList, total, current, list, isLoading, saveItem } = useList(
       return it;
     })
     // return mockFiles
-    return res
+    return res.sort((a, b) => {
+      if (a.type !== b.type) {
+        return a.type === 'directory' ? -1 : 1;
+      }
+      if (a.type === 'directory') {
+        return a.name.localeCompare(b.name);
+      }
+      return new Date(a.modifiedTime) - new Date(b.modifiedTime)
+    })
   }
 );
 const handleUplaodConfirm = async () => {
@@ -220,24 +216,41 @@ const handleDelete = async (item) => {
 };
 
 const handleNewDirectory = async () => {
-  uni.showModal({
-    title: `文件夹`,
-    editable: true,
-    cancelText: "取消",
-    confirmText: "确认",
-    placeholderText: "请输入文件夹名称",
-    async success(res) {
-      if (!res.content) {
-        uni.gb.showToast("文件夹名称不能为空");
-        return;
-      }
-      const path = formatEndpath(currentPath.value) + "/" + res.content;
-      const [err, result] = await rqs.post("/makedir", { path });
-      if (err) return uni.gb.showErr(err.message);
-      getList();
-    },
-  });
+  directoryNmae.value = ''
+  isShowDireactor.value = true
+  // uni.showModal({
+  //   title: `文件夹`,
+  //   editable: true,
+  //   cancelText: "取消",
+  //   confirmText: "确认",
+  //   placeholderText: "请输入文件夹名称",
+  //   async success(res) {
+  //     if (!res.content) {
+  //       uni.gb.showToast("文件夹名称不能为空");
+  //       return;
+  //     }
+  //     const path = formatEndpath(currentPath.value) + "/" + res.content;
+  //     const [err, result] = await rqs.post("/makedir", { path });
+  //     if (err) return uni.gb.showErr(err.message);
+  //     getList();
+  //   },
+  // });
 };
+const handleAddDirectory = async () => {
+  const newName = directoryNmae.value.trim()
+  if (!newName) {
+    uni.gb.showToast("文件夹名称不能为空");
+    return
+  }
+  const path = formatEndpath(currentPath.value) + "/" + newName
+  uni.gb.loading()
+  const [err, result] = await rqs.post("/makedir", { path });
+  uni.gb.loading(false)
+  if (err) return uni.gb.showErr(err.message);
+  uni.gb.showToast('新增成功')
+  isShowDireactor.value = false
+  getList();
+}
 
 const handleCopy = async (data) => {
   uni.setClipboardData({
