@@ -9,7 +9,6 @@ upload() {
     npm run build
     node script.js end
     cp package.json dist
-    # cp -r public dist/
     mv dist/index.js dist/$1.js
     mv dist $1
     zip -r $1.zip $1
@@ -19,6 +18,7 @@ upload() {
     ssh -p $prot $host "
     cd $path &&
     pm2 stop $1 &&
+    rm -rf $1 &&
     unzip -o $1.zip &&
     rm -rf $1.zip &&
     cd $1 &&
@@ -27,18 +27,14 @@ upload() {
     echo "正式环境更新成功"
 }
 # pm2 stop $1.js &&
-
+# pm2 stop $1 &&
+# rm -rf $1 &&
 case $1 in
     up)
         upload "node-image-hosting-server"
     ;;
-    bendi)
-        rm -rf dist
-        npm run build
-        cp package.json dist
-        cp -r public dist/
-        cd dist
-        npm i
+    test)
+        scp -P $prot -r files $host:$path
     ;;
     *)
         echo "Invalid option: $1"

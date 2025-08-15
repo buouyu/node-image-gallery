@@ -30,9 +30,9 @@
           title="文件详情">
           <view class="file-detail-card">
             <view @click="handleViewImage(activeItem.fullPath)" class="detail-header">
-              <image class="file-icon" :src="activeItem.url || defaultFileUrl" mode="aspectFit" />
+              <image class="file-icon" :src="isImageFile(activeItem.name) ? activeItem.fullPath : defaultFileUrl"
+                mode="aspectFit" />
             </view>
-
             <view class="detail-body">
               <view class="detail-row">
                 <text class="label">文件名称：</text>
@@ -60,6 +60,7 @@
 
           </view>
         </Popup>
+        <ProgressLoading :progress="progress" text="图片上传中" v-model="isUploadLoading"></ProgressLoading>
         <view class="file-manager-header">
           <!-- 路径导航 -->
           <view class="path-bar">
@@ -108,6 +109,7 @@ import ListPage from "lby-common/components/layout/ListPage.vue";
 import Popup from "lby-common/components/layout/Popup.vue";
 import UploadFile from "@/components/UploadFile.vue";
 import { useList, rqs, formatTime } from "lby-common";
+import ProgressLoading from '@/components/ProgressLoading.vue'
 // 这里是静态 mock 数据（仅 UI 用）
 // const mockFiles = [
 //     { name: "文档", type: "directory", size: null, modifiedTime: "2025-08-13 10:20" },
@@ -119,6 +121,8 @@ const defaultFileUrl = "https://img.icons8.com/fluency/96/document.png";
 const currentDirectorys = ref([]);
 const isShowUplaodPopup = ref(false);
 const uplaodRef = ref(null);
+const isUploadLoading = ref(false)
+const progress = ref(0)
 const renderDirectorys = computed(() => {
   return ["root", ...currentDirectorys.value];
 });
@@ -139,7 +143,7 @@ const { getList, total, current, list, isLoading, saveItem } = useList(
     res.map((it) => {
       if (it.type == "file") {
         // it.fullPath = baseUrl + currentPath.value + "/" + it.name;
-        if (isImageFile(it.name)) {
+        if (isImageFile(it.name) && res.length <= 100 && it.size <= 512000) {
           it.url = it.fullPath;
         }
         it.path = currentPath.value + "/" + it.name;
@@ -147,21 +151,24 @@ const { getList, total, current, list, isLoading, saveItem } = useList(
       return it;
     })
     // return mockFiles
-    return res.sort((a, b) => {
-      if (a.type !== b.type) {
-        return a.type === 'directory' ? -1 : 1;
-      }
-      if (a.type === 'directory') {
-        return a.name.localeCompare(b.name);
-      }
-      // return a.ext.localeCompare(b.ext);
-    })
+    return res
   }
 );
 const handleUplaodConfirm = async () => {
-  await uplaodRef.value.save(formatEndpath(currentPath.value));
+  isUploadLoading.value = true
+  progress.value = 0
+  const list = await uplaodRef.value.save(formatEndpath(currentPath.value), (num) => {
+    progress.value = num
+  });
+  console.log('list-----163', list)
+  isUploadLoading.value = false
   getList();
-  uni.gb.showToast("上传成功");
+  const rejectedList = list.filter(it => it.status == 'rejected')
+  if (rejectedList.length) {
+    uni.gb.showToast(`存在${rejectedList.length}个图上传失败,${rejectedList[0].reason.message}`)
+  } else {
+    uni.gb.showToast("上传成功");
+  }
   isShowUplaodPopup.value = false;
 };
 const handleClickUpload = async () => {
@@ -524,11 +531,11 @@ const formatSize = (bytes) => {
     }
 
     &.directory {
-      background-image: url("https://img.icons8.com/fluency/96/folder-invoices.png");
+      background-image: url("https://buouyu.cn:8888/files/node-image-gallery/icon/folder-invoices.png");
     }
 
     &.file {
-      background-image: url("https://img.icons8.com/fluency/96/document.png");
+      background-image: url("https://buouyu.cn:8888/files/node-image-gallery/icon/document.png");
     }
   }
 

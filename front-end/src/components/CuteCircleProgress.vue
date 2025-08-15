@@ -4,13 +4,18 @@
       <!-- 渐变定义 -->
       <defs>
         <linearGradient id="pinkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#ffd6e8" />
-          <stop offset="100%" stop-color="#ff4f9a" />
+          <stop offset="0%" stop-color="#ffd6e8" /> <!-- 浅粉 -->
+          <stop offset="100%" stop-color="#ff4f9a" /> <!-- 深粉 -->
         </linearGradient>
       </defs>
 
       <!-- 背景圆 -->
-      <circle class="circle-bg" cx="60" cy="60" r="54" />
+      <circle
+        class="circle-bg"
+        cx="60"
+        cy="60"
+        r="54"
+      />
 
       <!-- 进度圆 -->
       <circle
@@ -21,34 +26,11 @@
         r="54"
         stroke="url(#pinkGradient)"
       />
-
-      <!-- 冲刺光点 -->
-      <circle
-        class="circle-head"
-        :transform="headTransform"
-        r="5"
-        fill="#fff"
-      >
-        <animateTransform
-          attributeName="transform"
-          type="rotate"
-          from="0 60 60"
-          :to="`${progress * 3.6} 60 60`"
-          dur="0.6s"
-          fill="freeze"
-        />
-      </circle>
     </svg>
 
-    <!-- 中心文字 + 小气泡 -->
     <view class="circle-text">
       <text>{{ progress }}%</text>
       <view class="bubble"></view>
-    </view>
-
-    <!-- 正在加载中文字 -->
-    <view class="loading-text">
-      正在加载中<text>.</text><text>.</text><text>.</text>
     </view>
   </view>
 </template>
@@ -57,32 +39,26 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  progress: { type: Number, default: 0 }
+  progress: { type: Number, default: 0 } // 0-100
 })
 
-const radius = 54
-const circumference = 2 * Math.PI * radius
+const circumference = 2 * Math.PI * 54
 
 const dashOffset = computed(() => {
   return circumference - (props.progress / 100) * circumference
-})
-
-// 光点位置
-const headTransform = computed(() => {
-  return `rotate(${props.progress * 3.6} 60 60) translate(0 -54)`
 })
 </script>
 
 <style lang="scss" scoped>
 .circle-progress {
   width: 150rpx;
-  height: 180rpx; /* 高度稍微多一点给文字留空间 */
+  height: 150rpx;
   position: relative;
 
   .circle-svg {
     transform: rotate(-90deg);
     width: 100%;
-    height: 150rpx;
+    height: 100%;
   }
 
   .circle-bg {
@@ -97,10 +73,6 @@ const headTransform = computed(() => {
     stroke-linecap: round;
     stroke-dasharray: 339.292;
     transition: stroke-dashoffset 0.6s ease;
-  }
-
-  .circle-head {
-    filter: drop-shadow(0 0 6px rgba(255, 105, 180, 0.9));
   }
 
   .circle-text {
@@ -129,39 +101,11 @@ const headTransform = computed(() => {
       animation: bubbleMove 1.5s infinite ease-in-out;
     }
   }
-
-  .loading-text {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 22rpx;
-    font-weight: 500;
-    color: #ff4f9a;
-    animation: fadePulse 1.5s infinite ease-in-out;
-
-    text {
-      animation: dotBlink 1.5s infinite;
-    }
-    text:nth-child(1) { animation-delay: 0s; }
-    text:nth-child(2) { animation-delay: 0.3s; }
-    text:nth-child(3) { animation-delay: 0.6s; }
-  }
 }
 
 @keyframes bubbleMove {
   0% { transform: translate(-50%, 0); opacity: 0.8; }
   50% { transform: translate(-50%, -10rpx); opacity: 1; }
   100% { transform: translate(-50%, 0); opacity: 0.8; }
-}
-
-@keyframes fadePulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-@keyframes dotBlink {
-  0%, 80%, 100% { opacity: 0; }
-  40% { opacity: 1; }
 }
 </style>

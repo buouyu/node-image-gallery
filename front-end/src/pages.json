@@ -22,7 +22,7 @@
     {
       "path": "pages/login",
       "style": {
-        "navigationBarTitleText": "标记鱼",
+        "navigationBarTitleText": "登录",
         "navigationBarBackgroundColor": "#a3e636",
         "navigationBarTextStyle": "white",
         "backgroundColor": "#ff0000"

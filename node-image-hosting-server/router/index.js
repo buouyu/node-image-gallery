@@ -8,7 +8,10 @@ const prefix = '/api'
 const rootPath = path.resolve(process.cwd(), 'public');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'zheshiyigehenchangdezifuchuanaaaa'; // 生产中请放入环境变量
-const baseDir = path.resolve(process.cwd(), 'files');
+// const baseDir = path.resolve(process.cwd(), '../files');
+// console.log('require.main.path-----12', require.main.path)
+
+const baseDir = path.join(require.main.path, '../files');
 if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ limit: "50mb" }))

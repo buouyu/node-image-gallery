@@ -65,7 +65,16 @@ const routers = [
     }
 ]
 
-
+async function checkFile(path) {
+    try {
+        fs.accessSync(path, fs.constants.F_OK);
+        console.log('文件存在');
+        return true
+    } catch {
+        console.log('文件不存在');
+        return false
+    }
+}
 app.post(`${prefix}/upload`, verifyToken, upload.single('file'), asyncHandler(async (req) => {
 
     // const name = md5()
@@ -74,8 +83,11 @@ app.post(`${prefix}/upload`, verifyToken, upload.single('file'), asyncHandler(as
     // const date = formatTime(new Date(), 'YYYY-MM').split('-')
     const mypath = req.body.path
     const targetPath = path.join(baseDir, mypath);
+    const isExist = await checkFile(targetPath)
+    if (isExist) {
+        throw Error('文件已存在')
+    }
     fs.writeFileSync(targetPath, req.file.buffer);
-    console.log('mypath-----77', mypath)
     return `${fileBaseUrl}${mypath}`
 }))
 
