@@ -19,7 +19,6 @@ app.use(express.static(rootPath))
 
 const allowedOrigins = [
     'http://localhost:5173',
-    'https://sub.example.com'
 ];
 app.use("/files", (req, res, next) => {
     const origin = req.headers.origin;
