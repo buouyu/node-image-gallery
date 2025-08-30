@@ -1,6 +1,6 @@
 <template>
         <view>
-                <up-upload :previewFullImage="true" class="" name="3" :fileList="fileList" @afterRead="afterRead"
+                <up-upload :previewFullImage="true" class="" name="3" accept="all" :fileList="fileList" @afterRead="afterRead"
                         @delete="deletePic" @clickPreview="clickPreview" multiple :maxCount="9"></up-upload>
         </view>
 </template>
